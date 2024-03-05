@@ -1,0 +1,107 @@
+{% extends 'students_management/base.html' %}
+{% block body %}
+<p>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addnewmember" style="width:300px;">
+  Add New
+</button>
+</p>
+<!-- Modal -->
+<div class="modal fade" id="addnewmember" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add New</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+     
+
+      <div class="modal-body">
+        <form method="POST" id="addStudentForm"> <!-- Added form element with id -->
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>name</label>
+                <input type="text" id="name" class="form-control"/>
+            </div>        
+            <div class="mb-3">
+                <label>rollno</label>
+                <input type="text" id="rollno" class="form-control"/>
+            </div>
+            <div class="mb-3">
+                <label>standard</label>
+                <input type="text" id="standard" class="form-control"/>
+            </div>
+            <div class="mb-3">
+                <label>course</label>
+                <input type="text" id="course" class="form-control"/>
+            </div>
+         
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="submit">Submit</button> <!-- Changed button type to submit -->
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+ 
+<hr style="border-top:1px solid #000; clear:both;"/>
+<table id="table" class="table table-bordered">
+    <thead class="alert-warning">
+        <tr>
+            <th>name</th>
+            <th>rollno</th>
+            <th>standard</th>
+            <th>course</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in all_students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.rollno }}</td>
+            <td>{{ student.standard}}</td>
+            <td>{{ student.course}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#table').DataTable();
+     
+    $('#addStudentForm').submit(function(event) { // Changed to form submission event
+        event.preventDefault(); // Prevent default form submission
+
+        var $name = $('#name').val();
+        var $rollno = $('#rollno').val();
+        var $standard = $('#standard').val();
+        var $course = $('#course').val();
+        if($name == "" || $rollno == "" || $standard == ""){
+            alert("Please complete field");
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "insert",
+                data: {
+                    name: $name,
+                    rollno: $rollno,
+                    standard: $standard,
+                    course: $course,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(){
+                    alert('Save Data');
+                    $('#name').val('');
+                    $('#rollno').val('');
+                    $('#standard').val('');
+                    $('#course').val('');
+                    window.location = "/";
+                }
+            });
+        }
+    });
+});
+</script>
